@@ -30,17 +30,21 @@ services:
       TRADINGAGENTS_LOG_LEVEL: "INFO"
       TRADINGAGENTS_LOG_DIR: "/app/logs"
       TRADINGAGENTS_LOG_FILE: "/app/logs/tradingagents.log"
-      # Docker专用数据库配置
+      # Docker专用数据库配置（覆盖 .env 中的 localhost）
       TRADINGAGENTS_MONGODB_URL: mongodb://admin:tradingagents123@mongodb:27017/tradingagents?authSource=admin
       TRADINGAGENTS_REDIS_URL: redis://:tradingagents123@redis:6379
       TRADINGAGENTS_CACHE_TYPE: redis
+      MONGODB_HOST: mongodb
+      MONGODB_CONNECTION_STRING: mongodb://admin:tradingagents123@mongodb:27017/tradingagents?authSource=admin
+      MONGO_URI: mongodb://admin:tradingagents123@mongodb:27017/tradingagents?authSource=admin
+      REDIS_HOST: redis
       # Docker环境标识
       DOCKER_CONTAINER: "true"
       # API配置
       API_HOST: "0.0.0.0"
       API_PORT: "8000"
       # CORS配置
-      CORS_ORIGINS: "http://localhost:3000,http://localhost:8080,http://localhost:5173"
+      CORS_ORIGINS: "http://localhost:3100,http://localhost:8080,http://localhost:5173"
     depends_on:
       mongodb:
         condition: service_healthy
@@ -69,7 +73,7 @@ services:
     image: tradingagents-frontend:v1.0.0-preview
     container_name: tradingagents-frontend
     ports:
-      - "3000:80"
+      - "3100:80"  # 避免与本机 3000 端口冲突
     environment:
       TZ: "Asia/Shanghai"
       # 后端API地址
@@ -153,7 +157,7 @@ services:
     container_name: tradingagents-redis-commander
     restart: unless-stopped
     ports:
-      - "8081:8081"
+      - "8181:8081"  # 避免与 feishu-token 8081 冲突
     environment:
       - REDIS_HOSTS=local:redis:6379:0:tradingagents123
     networks:
